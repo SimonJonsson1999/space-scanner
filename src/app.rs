@@ -13,9 +13,11 @@ pub struct App {
 impl App {
     pub fn new(current_dir: PathBuf, transmitter: mpsc::Sender<UpdateEvent>) -> Self {
         let size_calculator = SizeCalculator::new(transmitter);
+        let mut directory_scanner = DirectoryScanner::new(current_dir, size_calculator,0);
+        directory_scanner.update_entries();
         Self {
             selected: 0,
-            directory_scanner: DirectoryScanner::new(current_dir, size_calculator,0),
+            directory_scanner,
             max_depth: 5
         }
     }
@@ -75,7 +77,7 @@ impl App {
     }
 
     pub fn change_dir(&mut self) {
-        if self.directory_scanner.set_dir_to_index(self.selected) {
+        if self.directory_scanner.navigate_to_index(self.selected) {
             self.selected = 0;
         }     
 }
